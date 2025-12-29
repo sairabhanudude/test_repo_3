@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BuggyMart</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#f4f7fb; padding:20px; }
-    h1 { color:#333; }
+    body { font-family: Arial, sans-serif; background:#eef2f7; padding:20px; }
+    h1 { color:#1f2937; }
     table { width:100%; border-collapse:collapse; background:#fff; }
-    th, td { border:1px solid #ddd; padding:10px; text-align:center; }
-    th { background:#eee; }
-    button { padding:10px 15px; margin-top:15px; cursor:pointer; }
+    th, td { border:1px solid #ccc; padding:10px; text-align:center; }
+    th { background:#f3f4f6; }
+    button { padding:10px 14px; margin-top:15px; cursor:pointer; }
+    #notice { color:#b91c1c; }
     #flash { position:fixed; inset:0; border:4px solid transparent; pointer-events:none; }
   </style>
 </head>
 <body>
   <h1>BuggyMart</h1>
-  <p>A simple shopping cart (contains intentional bugs).</p>
-
+  
   <table>
     <thead>
       <tr>
@@ -29,22 +29,22 @@
     </thead>
     <tbody>
       <tr>
-        <td>Notebook</td>
-        <td>$5</td>
-        <td id="s-note">50</td>
-        <td><input id="q-note" type="number" value="0"></td>
+        <td>Water Bottle</td>
+        <td>$10</td>
+        <td id="s-bottle">30</td>
+        <td><input id="q-bottle" type="number" value="0"></td>
       </tr>
       <tr>
-        <td>Pen</td>
-        <td>$2</td>
-        <td id="s-pen">100</td>
-        <td><input id="q-pen" type="number" value="0"></td>
+        <td>T‑Shirt</td>
+        <td>$25</td>
+        <td id="s-shirt">20</td>
+        <td><input id="q-shirt" type="number" value="0"></td>
       </tr>
       <tr>
-        <td>Backpack</td>
-        <td>$40</td>
-        <td id="s-bag">15</td>
-        <td><input id="q-bag" type="number" value="0"></td>
+        <td>Cap</td>
+        <td>$15</td>
+        <td id="s-cap">40</td>
+        <td><input id="q-cap" type="number" value="0"></td>
       </tr>
     </tbody>
   </table>
@@ -53,70 +53,70 @@
   <button id="reset">Reset</button>
 
   <h2>Total: $<span id="total">0</span></h2>
+  <p id="notice"></p>
 
   <div id="flash"></div>
 
   <script>
-    const defaults = { note:50, pen:100, bag:15 };
+    const defaults = { bottle:30, shirt:20, cap:40 };
 
     function load() {
-      const data = JSON.parse(localStorage.getItem('buggymart'));
-      if (data) {
-        document.getElementById('s-note').textContent = data.note;
-        document.getElementById('s-pen').textContent = data.pen;
-        document.getElementById('s-bag').textContent = data.bag;
+      const d = JSON.parse(localStorage.getItem('buggymartX'));
+      if (d) {
+        document.getElementById('s-bottle').textContent = d.bottle;
+        document.getElementById('s-shirt').textContent = d.shirt;
+        document.getElementById('s-cap').textContent = d.cap;
       }
     }
     load();
 
     function save() {
-      const data = {
-        note: +document.getElementById('s-note').textContent,
-        pen: +document.getElementById('s-pen').textContent,
-        bag: +document.getElementById('s-bag').textContent
+      const d = {
+        bottle: document.getElementById('s-bottle').textContent,
+        shirt: document.getElementById('s-shirt').textContent,
+        cap: document.getElementById('s-cap').textContent
       };
-      localStorage.setItem('buggymart', JSON.stringify(data));
+      localStorage.setItem('buggymartX', JSON.stringify(d));
     }
 
-    document.getElementById('checkout').onclick = function() {
-      const n = parseInt(document.getElementById('q-note').value);
-      const p = parseInt(document.getElementById('q-pen').value);
-      const b = parseInt(document.getElementById('q-bag').value);
+    document.getElementById('checkout').addEventListener('click', ()=>{
+      const b = document.getElementById('q-bottle').value;
+      const s = document.getElementById('q-shirt').value;
+      const c = document.getElementById('q-cap').value;
 
-      // Intentional bugs live here
+      // Different intentional bugs
 
-      let total = n*5 + p*2 + b*40;
-      document.getElementById('total').textContent = total;
+      let total = (b * 10) + (s * 25) + (c * 15);
+      document.getElementById('total').innerHTML = total;
 
-      document.getElementById('s-note').textContent -= n;
-      document.getElementById('s-pen').textContent -= p;
-      document.getElementById('s-bag').textContent -= b;
+      document.getElementById('s-bottle').textContent -= b;
+      document.getElementById('s-shirt').textContent -= s;
+      document.getElementById('s-cap').textContent -= c;
 
+      document.getElementById('notice').innerText = "Order placed";
       save();
-    };
+    });
 
-    document.getElementById('reset').onclick = function() {
-      // Buggy reset (intentional)
-      document.getElementById('q-note').value = 0;
-      document.getElementById('q-pen').value = 0;
-      // Bag quantity not reset on purpose
+    document.getElementById('reset').addEventListener('click', ()=>{
+      // Intentionally flawed reset
+      document.getElementById('q-bottle').value = 0;
+      document.getElementById('q-shirt').value = 0;
+      document.getElementById('notice').innerText = "";
+      // Cap qty & total not reset
+    });
 
-      // Total not reset
-    };
-
-    // Hidden admin reset CTRL + ALT + B
-    document.addEventListener('keydown', e => {
-      if (e.ctrlKey && e.altKey && e.key === 'b') {
-        localStorage.removeItem('buggymart');
-        document.getElementById('s-note').textContent = defaults.note;
-        document.getElementById('s-pen').textContent = defaults.pen;
-        document.getElementById('s-bag').textContent = defaults.bag;
-        document.getElementById('total').textContent = 0;
+    // Admin reset CTRL + ALT + X
+    document.addEventListener('keydown', e=>{
+      if (e.ctrlKey && e.altKey && e.key === 'x') {
+        localStorage.removeItem('buggymartX');
+        document.getElementById('s-bottle').textContent = defaults.bottle;
+        document.getElementById('s-shirt').textContent = defaults.shirt;
+        document.getElementById('s-cap').textContent = defaults.cap;
+        document.getElementById('total').innerText = 0;
 
         const f = document.getElementById('flash');
-        f.style.borderColor = 'red';
+        f.style.borderColor = 'green';
         setTimeout(()=>f.style.borderColor='transparent',300);
-
         save();
       }
     });
