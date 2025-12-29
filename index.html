@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BuggyMart</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f7fb; padding:20px; }
+    h1 { color:#333; }
+    table { width:100%; border-collapse:collapse; background:#fff; }
+    th, td { border:1px solid #ddd; padding:10px; text-align:center; }
+    th { background:#eee; }
+    button { padding:10px 15px; margin-top:15px; cursor:pointer; }
+    #flash { position:fixed; inset:0; border:4px solid transparent; pointer-events:none; }
+  </style>
+</head>
+<body>
+  <h1>BuggyMart</h1>
+  <p>A simple shopping cart (contains intentional bugs).</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Qty</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Notebook</td>
+        <td>$5</td>
+        <td id="s-note">50</td>
+        <td><input id="q-note" type="number" value="0"></td>
+      </tr>
+      <tr>
+        <td>Pen</td>
+        <td>$2</td>
+        <td id="s-pen">100</td>
+        <td><input id="q-pen" type="number" value="0"></td>
+      </tr>
+      <tr>
+        <td>Backpack</td>
+        <td>$40</td>
+        <td id="s-bag">15</td>
+        <td><input id="q-bag" type="number" value="0"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button id="checkout">Checkout</button>
+  <button id="reset">Reset</button>
+
+  <h2>Total: $<span id="total">0</span></h2>
+
+  <div id="flash"></div>
+
+  <script>
+    const defaults = { note:50, pen:100, bag:15 };
+
+    function load() {
+      const data = JSON.parse(localStorage.getItem('buggymart'));
+      if (data) {
+        document.getElementById('s-note').textContent = data.note;
+        document.getElementById('s-pen').textContent = data.pen;
+        document.getElementById('s-bag').textContent = data.bag;
+      }
+    }
+    load();
+
+    function save() {
+      const data = {
+        note: +document.getElementById('s-note').textContent,
+        pen: +document.getElementById('s-pen').textContent,
+        bag: +document.getElementById('s-bag').textContent
+      };
+      localStorage.setItem('buggymart', JSON.stringify(data));
+    }
+
+    document.getElementById('checkout').onclick = function() {
+      const n = parseInt(document.getElementById('q-note').value);
+      const p = parseInt(document.getElementById('q-pen').value);
+      const b = parseInt(document.getElementById('q-bag').value);
+
+      // Intentional bugs live here
+
+      let total = n*5 + p*2 + b*40;
+      document.getElementById('total').textContent = total;
+
+      document.getElementById('s-note').textContent -= n;
+      document.getElementById('s-pen').textContent -= p;
+      document.getElementById('s-bag').textContent -= b;
+
+      save();
+    };
+
+    document.getElementById('reset').onclick = function() {
+      // Buggy reset (intentional)
+      document.getElementById('q-note').value = 0;
+      document.getElementById('q-pen').value = 0;
+      // Bag quantity not reset on purpose
+
+      // Total not reset
+    };
+
+    // Hidden admin reset CTRL + ALT + B
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey && e.altKey && e.key === 'b') {
+        localStorage.removeItem('buggymart');
+        document.getElementById('s-note').textContent = defaults.note;
+        document.getElementById('s-pen').textContent = defaults.pen;
+        document.getElementById('s-bag').textContent = defaults.bag;
+        document.getElementById('total').textContent = 0;
+
+        const f = document.getElementById('flash');
+        f.style.borderColor = 'red';
+        setTimeout(()=>f.style.borderColor='transparent',300);
+
+        save();
+      }
+    });
+  </script>
+</body>
+</html>
